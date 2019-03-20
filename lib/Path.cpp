@@ -5,7 +5,6 @@
 #include "../include/Path.h"
 #include <string>
 #include <iostream>
-#include <algorithm>
 using std::string;
 
 void Path::setPath(string fullPath) {
@@ -29,7 +28,7 @@ bool Path::__separateDir(string& pathWithDir) {
     size_t dirSize = pathWithDir.find_last_of('/');
     // Dir should end with / or be empty
     if(dirSize == string::npos) {
-        //Just let dir be empty
+        //Dir is probably ./
         dir = "";
     } else {
         //Otherwise  dir is all before the last '/'
@@ -46,6 +45,13 @@ bool Path::__separateDir(string& pathWithDir) {
     return true;
 }
 bool Path::__separateName(string &pathWithoutDir) {
+
+    // If path is empty, no file name and extension provided
+    if(pathWithoutDir.empty()) {
+        name = "";
+        ext = "";
+        return true;
+    }
     // Let's assume that all fileName has a length greater than zero and
     // fileNames and extensions has no '/' symbols
     // Since extension can contain an only dot we should find the last one
@@ -79,12 +85,19 @@ bool Path::__separateExt(string &pathWithoutDirAndName) {
 }
 
 void Path::setDirName(string dir_) {
-    __separateDir(dir_);
+    if(__separateDir(dir_)) {
+        // reset raw path
+        rawPath = "";
+    } else {
+        std::cerr << "Incorrect path provided. No dir was set!\n";
+    }
 }
 void Path::setFileName(string name_) {
     // name should not have '/' in it
     if(name_.find('/') == string::npos &&
     __separateName(name_)) {
+        // Reset raw path
+        rawPath = "";
         // if name_ includes extension
         if(!name_.empty())
             __separateExt(name_);
@@ -97,7 +110,8 @@ void Path::setFileExt(string ext_) {
     if(ext_.find('/') == string::npos &&
        ext_.find('.', 1) == string::npos &&
     __separateExt(ext_)) {
-        // All is fine. Do nothing
+        // Reset raw path
+        rawPath = "";
     } else {
         std::cerr << "Incorrect path provided. No file extension was set!\n";
     }
@@ -121,7 +135,7 @@ string Path::getFileExt() {
     return ext;
 }
 void Path::resetPath() {
-    dir = name = ext = "";
+    dir = name = ext = rawPath = "";
 }
 string Path::getRawPath() {
     return rawPath;

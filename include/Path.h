@@ -35,7 +35,7 @@ public:
     string getFileName();
     // Return file ext i.e. txt (not .txt)
     string getFileExt();
-    // reset stored values
+    // reset stored values to ""
     void resetPath();
 };
 

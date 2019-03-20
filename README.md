@@ -1,5 +1,5 @@
 # Path
-A simple c++ repository created for simplier interaction with files.
+A simple c++ repository created for easier interaction with files.
 
 ```c++
 Path* path = new Path;

@@ -27,7 +27,7 @@ public:
     // Works only if setPath(string); was used for path settings
     // Otherwise returns an empty string
     string getRawPath();
-    // Return full path to file i.e. ../lib/test.txt
+    // Return full path to file i.e. ../lib/test.txt or ../lib/
     string getPath();
     // Return directory name i.e. ../lib (not ../lib/)
     string getDirName();

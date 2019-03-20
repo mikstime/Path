@@ -13,13 +13,8 @@ void Path::setPath(string fullPath) {
     string dirCopy = dir, nameCopy = name, extCopy = ext;
     // Copy fullPath to change rawPath on success
     string pathCopy = fullPath;
-    // fullPath is changing during these manipulations
-    bool a, b, c;
-    a = __separateDir(fullPath);
-    b = __separateName(fullPath);
-    c = __separateExt(fullPath);
-    std::cout << a << b << c;
-    if(a && b && c) {
+    // fullPath is changing during these manipulations!!!
+    if(__separateDir(fullPath) && __separateName(fullPath) && __separateExt(fullPath)) {
         rawPath = pathCopy;
     } else {
         dir = dirCopy;
@@ -28,9 +23,26 @@ void Path::setPath(string fullPath) {
         std::cerr << "Incorect path provided. Path was not changed!\n";
     }
 }
-bool Path::__separateExt(string &pathWithoutDirAndName) {
-    // since files can have no extension
-    ext = pathWithoutDirAndName;
+bool Path::__separateDir(string& pathWithDir) {
+    // Since name and extension can't contain '/'
+    // dir should end  with '/' or be empty
+    size_t dirSize = pathWithDir.find_last_of('/');
+    // Dir should end with / or be empty
+    if(dirSize == string::npos) {
+        //Just let dir be empty
+        dir = "";
+    } else {
+        //Otherwise  dir is all before the last '/'
+        dir = pathWithDir.substr(0, dirSize);
+        // Remove dir from path for easier separation later
+        // dirSize can't be larger than pathWithDir
+        if(dirSize < pathWithDir.size()) {
+            pathWithDir.erase(0, dirSize + 1);
+        }  else {
+            pathWithDir.erase(0, dirSize);
+        }
+    }
+
     return true;
 }
 bool Path::__separateName(string &pathWithoutDir) {
@@ -57,57 +69,23 @@ bool Path::__separateName(string &pathWithoutDir) {
 
     return true;
 }
-bool Path::__separateDir(string& pathWithDir) {
-    // Since name and extension can't contain '/'
-    // dir should end  with '/' or be empty
-    size_t dirSize = pathWithDir.find_last_of('/');
-    // Dir should end with / or be empty
-    if(dirSize == string::npos) {
-        //Just let dir be empty
-        dir = "";
-    } else {
-        //Otherwise  dir is all before the last '/'
-        dir = pathWithDir.substr(0, dirSize);
-        // Remove dir from path for easier separation later
-        // dirSize can't be larger than pathWithDir
-        if(dirSize < pathWithDir.size()) {
-            pathWithDir.erase(0, dirSize + 1);
-        }  else {
-            pathWithDir.erase(0, dirSize);
-        }
-    }
-
+bool Path::__separateExt(string &pathWithoutDirAndName) {
+    // since files can have no extension
+    ext = pathWithoutDirAndName;
     return true;
 }
-void Path::setDirName(string dir_) {
-    if(!dir_.empty() && dir_[ dir_.size() - 1] == '/')
-        dir_.erase(dir_.size() - 1);
 
-    dir = dir_;
+void Path::setDirName(string dir_) {
+    __separateDir(dir_);
 }
 void Path::setFileName(string name_) {
-    // File name should not contain /
-    if(name_.find('/') == string::npos) {
-        // Remove extension and process it
-        size_t extStart = name_.find('.');
-        if(extStart != string::npos) {
-            ext = name_.substr(extStart + 1);
-            name_.erase(extStart);
-            name = name_;
-        } else {
-            name = name_;
-        }
-
-    } else {
-        std::cerr << "Incorect string presented\n";
-        std::cerr << "No name was set";
-        return;
-    }
+    __separateName(name_);
+    // If format was name.ext
+    if(!name_.empty())
+        __separateExt(name_);
 }
 void Path::setFileExt(string ext_) {
-    if(!ext_.empty() && ext_[0] == '.')
-        ext_.erase(0,1);
-    ext = ext_;
+    __separateExt(ext_);
 }
 string Path::getPath() {
 

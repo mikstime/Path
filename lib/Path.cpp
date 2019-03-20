@@ -20,7 +20,7 @@ void Path::setPath(string fullPath) {
         dir = dirCopy;
         name = nameCopy;
         ext = extCopy;
-        std::cerr << "Incorect path provided. Path was not changed!\n";
+        std::cerr << "Incorrect path provided. Path was not changed!\n";
     }
 }
 bool Path::__separateDir(string& pathWithDir) {
@@ -71,6 +71,9 @@ bool Path::__separateName(string &pathWithoutDir) {
 }
 bool Path::__separateExt(string &pathWithoutDirAndName) {
     // since files can have no extension
+    // Remove period at the start
+    if(pathWithoutDirAndName[0] == '.')
+        pathWithoutDirAndName.erase(0, 1);
     ext = pathWithoutDirAndName;
     return true;
 }
@@ -79,13 +82,25 @@ void Path::setDirName(string dir_) {
     __separateDir(dir_);
 }
 void Path::setFileName(string name_) {
-    __separateName(name_);
-    // If format was name.ext
-    if(!name_.empty())
-        __separateExt(name_);
+    // name should not have '/' in it
+    if(name_.find('/') == string::npos &&
+    __separateName(name_)) {
+        // if name_ includes extension
+        if(!name_.empty())
+            __separateExt(name_);
+    } else {
+        std::cerr << "Incorrect path provided. No file name was set!\n";
+    }
 }
 void Path::setFileExt(string ext_) {
-    __separateExt(ext_);
+    // Extension should not contain '/' or '.' symbol
+    if(ext_.find('/') == string::npos &&
+       ext_.find('.', 1) == string::npos &&
+    __separateExt(ext_)) {
+        // All is fine. Do nothing
+    } else {
+        std::cerr << "Incorrect path provided. No file extension was set!\n";
+    }
 }
 string Path::getPath() {
 

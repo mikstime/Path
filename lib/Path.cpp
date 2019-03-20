@@ -98,7 +98,7 @@ void Path::setDirName(string dir_) {
         // reset raw path
         rawPath = "";
     } else {
-        throw std::invalid_argument("Incorrect path provided. No dir name was set!\n");
+        throw std::invalid_argument("Incorrect path provided. No directory name was set!\n");
     }
 }
 void Path::setFileName(string name_) {

@@ -19,10 +19,14 @@ void Path::setPath(string fullPath) {
         dir = dirCopy;
         name = nameCopy;
         ext = extCopy;
-        std::cerr << "Incorrect path provided. Path was not changed!\n";
+        throw std::invalid_argument("Incorrect path provided. Path was not changed!\n");
     }
 }
 bool Path::__separateDir(string& pathWithDir) {
+    // Dir can't contain more than two periods in a row
+    if(pathWithDir.find("...") != string::npos) {
+        return false;
+    }
     // Since name and extension can't contain '/'
     // dir should end  with '/' or be empty
     size_t dirSize = pathWithDir.find_last_of('/');
@@ -94,12 +98,13 @@ void Path::setDirName(string dir_) {
         // reset raw path
         rawPath = "";
     } else {
-        std::cerr << "Incorrect path provided. No dir was set!\n";
+        throw std::invalid_argument("Incorrect path provided. No file name was set!\n");
     }
 }
 void Path::setFileName(string name_) {
     // name should not have '/' in it
-    if(name_.find('/') == string::npos &&
+    if(!name_.empty() &&
+       name_.find('/') == string::npos &&
     __separateName(name_)) {
         // Reset raw path
         rawPath = "";
@@ -107,7 +112,7 @@ void Path::setFileName(string name_) {
         if(!name_.empty())
             __separateExt(name_);
     } else {
-        std::cerr << "Incorrect path provided. No file name was set!\n";
+        throw std::invalid_argument("Incorrect path provided. No file name was set!\n");
     }
 }
 void Path::setFileExt(string ext_) {
@@ -118,7 +123,7 @@ void Path::setFileExt(string ext_) {
         // Reset raw path
         rawPath = "";
     } else {
-        std::cerr << "Incorrect path provided. No file extension was set!\n";
+        throw std::invalid_argument("Incorrect path provided. No file extension was set!\n");
     }
 }
 string Path::getPath() {

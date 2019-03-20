@@ -9,7 +9,11 @@
 using std::string;
 
 class Path {
-    string dir, name, ext;
+    string rawPath, dir, name, ext;
+
+    bool __separateDir(string&);
+    bool __separateName(string&);
+    bool __separateExt(string&);
 public:
     // Set full path to file
     void setPath(string);
@@ -20,6 +24,9 @@ public:
     // set file ext i.e. .txt or txt
     void setFileExt(string);
 
+    // Works only if setPath(string); was used for path settings
+    // Otherwise returns an empty string
+    string getRawPath();
     // Return full path to file i.e. ../lib/test.txt
     string getPath();
     // Return directory name i.e. ../lib (not ../lib/)

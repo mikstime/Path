@@ -4,24 +4,8 @@
 
 #include "../include/Path.h"
 #include <string>
-#include <iostream>
 using std::string;
 
-void Path::setPath(string fullPath) {
-    // Copy previous values to restore on failure
-    string dirCopy = dir, nameCopy = name, extCopy = ext;
-    // Copy fullPath to change rawPath on success
-    string pathCopy = fullPath;
-    // fullPath is changing during these manipulations!!!
-    if(__separateDir(fullPath) && __separateName(fullPath) && __separateExt(fullPath)) {
-        rawPath = pathCopy;
-    } else {
-        dir = dirCopy;
-        name = nameCopy;
-        ext = extCopy;
-        throw std::invalid_argument("Incorrect path provided. Path was not changed!\n");
-    }
-}
 bool Path::__separateDir(string& pathWithDir) {
     // Dir can't contain more than two periods in a row
     if(pathWithDir.find("...") != string::npos) {
@@ -45,7 +29,6 @@ bool Path::__separateDir(string& pathWithDir) {
             pathWithDir.erase(0, dirSize);
         }
     }
-
     return true;
 }
 bool Path::__separateName(string &pathWithoutDir) {
@@ -87,7 +70,24 @@ bool Path::__separateExt(string &pathWithoutDirAndName) {
     ext = pathWithoutDirAndName;
     return true;
 }
-
+void Path::setPath(string fullPath) {
+    // Copy previous values to restore on failure
+    string dirCopy = dir, nameCopy = name, extCopy = ext;
+    // Copy fullPath to change rawPath on success
+    string pathCopy = fullPath;
+    // fullPath is changing during these manipulations!!!
+    if(__separateDir(fullPath) &&
+       __separateName(fullPath) &&
+       __separateExt(fullPath)) {
+        rawPath = pathCopy;
+    } else {
+        dir = dirCopy;
+        name = nameCopy;
+        ext = extCopy;
+        throw std::invalid_argument("Incorrect path provided. "
+                                    "Path was not changed!\n");
+    }
+}
 void Path::setDirName(string dir_) {
     // Add '/' at the end of the dir_ for appropriate recognition
     if(!dir_.empty()) {
@@ -98,7 +98,8 @@ void Path::setDirName(string dir_) {
         // reset raw path
         rawPath = "";
     } else {
-        throw std::invalid_argument("Incorrect path provided. No directory name was set!\n");
+        throw std::invalid_argument("Incorrect path provided. "
+                                    "No directory name was set!\n");
     }
 }
 void Path::setFileName(string name_) {
@@ -112,7 +113,8 @@ void Path::setFileName(string name_) {
         if(!name_.empty())
             __separateExt(name_);
     } else {
-        throw std::invalid_argument("Incorrect path provided. No file name was set!\n");
+        throw std::invalid_argument("Incorrect path provided. "
+                                    "No file name was set!\n");
     }
 }
 void Path::setFileExt(string ext_) {
@@ -123,11 +125,12 @@ void Path::setFileExt(string ext_) {
         // Reset raw path
         rawPath = "";
     } else {
-        throw std::invalid_argument("Incorrect path provided. No file extension was set!\n");
+        throw std::invalid_argument("Incorrect path provided. "
+                                    "No file extension was set!\n");
     }
 }
 string Path::getPath() {
-
+    // Reorganize dir and extension for output
     string tempDir = !dir.empty() ? dir + "/" : "./";
     string tempExt = !ext.empty() > 0 ? '.' + ext : "";
 
@@ -136,6 +139,7 @@ string Path::getPath() {
     return tempDir;
 }
 string Path::getDirName() {
+    // Empty dir is the same as ./
     return !dir.empty() ? dir : ".";
 }
 string Path::getFileName() {
@@ -145,8 +149,12 @@ string Path::getFileExt() {
     return ext;
 }
 void Path::resetPath() {
+    // Reset all parameters
     dir = name = ext = rawPath = "";
 }
 string Path::getRawPath() {
+    // Return nonempty string only if the last
+    // setter was setPath(string);
+    // in other cases ""
     return rawPath;
 }

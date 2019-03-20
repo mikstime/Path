@@ -85,6 +85,11 @@ bool Path::__separateExt(string &pathWithoutDirAndName) {
 }
 
 void Path::setDirName(string dir_) {
+    // Add '/' at the end of the dir_ for appropriate recognition
+    if(!dir_.empty()) {
+        if(dir_[dir_.size() - 1] )
+            dir_ += '/';
+    }
     if(__separateDir(dir_)) {
         // reset raw path
         rawPath = "";
